@@ -1,33 +1,30 @@
 from flask_restful import Resource
-from ..modelos import db, Cancion, CancionSchema
+from ..modelos.modelos import db, Cancion, CancionSchema
 from flask import request
 
 cancion_schema = CancionSchema()
 
-#class VistaCanciones(Resource):
-#    def __get__(self):
-#        return [cancion_schema.dump(Cancion) for Cancion in Cancion.query.all()]
+from flask import request
+from flask_restful import Resource
+from ..modelos import db, Cancion, AlbumSchema
 
-#   def __pos__(self):
-#        nueva_cancion = Cancion(titulo=request.json['titulo'],\
-#                                minuto=request.json['minutos'],\
-#                                segundos=request.json['segundos'],\
-#                                interprete=request.json['interprete'])
-#        db.session.add(nueva_cancion)
-#        db.session.commit()
-#        return cancion_schema.dump(nueva_cancion)
+cancion_schema = AlbumSchema()
+
 class VistaCanciones(Resource):
-    def get(self, id_cancion):
-        return cancion_schema.dump(Cancion.query.get_or_404(id_cancion))
+    def get(self):
+        canciones = Cancion.query.all()
+        return [cancion_schema.dump(cancion) for cancion in canciones]
 
-    def put(self, id_cancion):
-        cancion = Cancion.query.get_or_404(id_cancion)
-        cancion.titulo = request.json.get('titulo', cancion.titulo)
-        cancion.minutos = request.json.get('minutos', cancion.minutos)
-        cancion.segundos = request.json.get('segundos', cancion.segundos)
-        cancion.interprete = request.json.get('interprete', cancion.interprete)
+    def post(self):
+        nueva_cancion = Cancion(
+            titulo=request.json['titulo'],
+            minutos=request.json['minutos'],
+            segundos=request.json['segundos'],
+            interprete=request.json['interprete']
+        )
+        db.session.add(nueva_cancion)
         db.session.commit()
-        return cancion_schema.dump(cancion)
+        return cancion_schema.dump(nueva_cancion), 201
 
     def delete(self, id_cancion):
         cancion = Cancion.query.get_or_404(id_cancion)
